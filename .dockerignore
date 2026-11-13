@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+docs/
+
+# Node
+node_modules
+npm-debug.log
+.npm
+
+# Maven
+target/
+.mvn/
+
+# IDE
+.idea
+.vscode
+*.iml
+*.ipr
+*.iws
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Build artifacts
+dist/
+build/

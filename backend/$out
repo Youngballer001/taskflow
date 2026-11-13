@@ -1,0 +1,16 @@
+
+The following files have been resolved:
+   org.springframework.boot:spring-boot-starter-web:jar:3.5.16:compile -- module spring.boot.starter.web [auto]
+   org.springframework.boot:spring-boot-starter-data-jpa:jar:3.5.16:compile -- module spring.boot.starter.data.jpa [auto]
+   org.springframework.boot:spring-boot-starter-security:jar:3.5.16:compile -- module spring.boot.starter.security [auto]
+   org.springframework.boot:spring-boot-starter-validation:jar:3.5.16:compile -- module spring.boot.starter.validation [auto]
+   com.mysql:mysql-connector-j:jar:9.7.0:runtime -- module mysql.connector.j (auto)
+   org.flywaydb:flyway-core:jar:11.7.2:compile -- module flyway.core (auto)
+   org.flywaydb:flyway-mysql:jar:11.7.2:compile -- module flyway.mysql (auto)
+   io.jsonwebtoken:jjwt-api:jar:0.12.3:compile -- module jjwt.api (auto)
+   io.jsonwebtoken:jjwt-impl:jar:0.12.3:runtime -- module jjwt.impl (auto)
+   io.jsonwebtoken:jjwt-jackson:jar:0.12.3:runtime -- module jjwt.jackson (auto)
+   org.springdoc:springdoc-openapi-starter-webmvc-ui:jar:2.3.0:compile -- module org.springdoc.openapi.ui [auto]
+   org.projectlombok:lombok:jar:1.18.46:compile (optional) -- module lombok
+   org.springframework.boot:spring-boot-devtools:jar:3.5.16:runtime (optional) -- module spring.boot.devtools [auto]
+

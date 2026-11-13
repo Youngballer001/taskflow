@@ -1,0 +1,3 @@
+-- TaskFlow Seed Data
+-- This file will contain initial seed data for the application
+-- To be implemented after database schema is finalized
