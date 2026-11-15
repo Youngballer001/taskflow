@@ -55,7 +55,7 @@ public class ReportService {
         long completed = tasks.stream().filter(task -> task.getStatus() == TaskStatus.COMPLETED).count();
         long overdue = tasks.stream().filter(task -> task.getDueDate() != null && task.getDueDate().isBefore(LocalDate.now())
                         && task.getStatus() != TaskStatus.COMPLETED && task.getStatus() != TaskStatus.CANCELLED).count();
-        long activeProjects = projects.stream().filter(project -> project.getStatus() != ProjectStatus.ARCHIVED).count();
+        long activeProjects = projects.stream().filter(project -> project.getStatus() == ProjectStatus.ACTIVE).count();
 
         double completionRate = tasks.isEmpty() ? 0.0 : (completed * 100.0) / tasks.size();
 

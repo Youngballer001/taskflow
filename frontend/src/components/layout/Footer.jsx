@@ -1,1 +1,1 @@
-// Footer component will be implemented here
+export default function Footer() { return <footer className="app-footer">TaskFlow</footer>; }

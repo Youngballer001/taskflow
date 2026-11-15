@@ -1,1 +1,4 @@
-// NotificationItem component will be implemented here
+import { formatDateTime } from '../../utils/formatters';
+import { Link } from 'react-router-dom';
+import { formatStatus } from '../../utils/formatters';
+export default function NotificationItem({ notification, onRead, onDelete }) { const target = notification.relatedTaskId ? `/tasks/${notification.relatedTaskId}` : notification.relatedProjectId ? `/projects/${notification.relatedProjectId}` : null; return <article className={`notification-item ${notification.isRead ? 'muted' : ''}`}><div className="notification-content"><span className="notification-category">{formatStatus(notification.type || 'GENERAL')}</span>{target ? <Link to={target} className="notification-message">{notification.message}</Link> : <p className="notification-message">{notification.message}</p>}<time>{formatDateTime(notification.createdAt)}</time></div><div className="notification-actions">{!notification.isRead && <button type="button" onClick={() => onRead(notification.id)}>Mark read</button>}{onDelete && <button type="button" onClick={() => onDelete(notification.id)}>Delete</button>}</div></article>; }

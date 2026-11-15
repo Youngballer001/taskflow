@@ -1,1 +1,3 @@
-// ProjectProgressChart component will be implemented here
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
+const COLORS = ['#6366f1', '#10b981', '#f59e0b', '#94a3b8', '#ef4444'];
+export default function ProjectProgressChart({ data = [] }) { const chartData = Array.isArray(data) ? data : Object.entries(data).map(([name, value]) => ({ name, value })); return <div className="chart-frame"><ResponsiveContainer><PieChart><Pie data={chartData} dataKey="value" nameKey="name" outerRadius={86} innerRadius={52} paddingAngle={3}>{chartData.map((item, index) => <Cell key={item.name} fill={COLORS[index % COLORS.length]} stroke="var(--color-surface)" />)}</Pie><Tooltip contentStyle={{ background: 'var(--color-surface)', borderColor: 'var(--color-border)', borderRadius: 10, color: 'var(--color-text)' }} /></PieChart></ResponsiveContainer></div>; }

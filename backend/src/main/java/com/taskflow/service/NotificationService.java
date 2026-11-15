@@ -68,12 +68,29 @@ public class NotificationService {
     }
 
     public void createNotification(User user, NotificationType type, String message) {
+        createNotification(user, type, message, null, null);
+    }
+
+    public void createNotification(User user, NotificationType type, String message, com.taskflow.entity.Project project, com.taskflow.entity.Task task) {
         Notification notification = new Notification();
         notification.setUser(user);
         notification.setType(type);
         notification.setMessage(message);
         notification.setIsRead(false);
+        notification.setRelatedProject(project);
+        notification.setRelatedTask(task);
         notificationRepository.save(notification);
+    }
+
+    @Transactional
+    public void deleteNotification(Long notificationId) {
+        User currentUser = securityUtil.getCurrentUser();
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with id: " + notificationId));
+        if (!notification.getUser().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("You do not have access to this notification");
+        }
+        notificationRepository.delete(notification);
     }
 }
 

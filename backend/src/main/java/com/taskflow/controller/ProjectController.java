@@ -30,7 +30,6 @@ public class ProjectController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('ADMIN','PROJECT_MANAGER','TEAM_MEMBER')")
     public ResponseEntity<ProjectResponse> createProject(@Valid @RequestBody CreateProjectRequest request) {
         return ResponseEntity.ok(projectService.createProject(request));
     }

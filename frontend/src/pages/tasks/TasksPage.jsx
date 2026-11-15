@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import taskApi from '../../api/taskApi';
+import projectApi from '../../api/projectApi';
 
 const defaultTaskForm = {
   title: '',
   description: '',
-  projectId: 1,
+  projectId: '',
   priority: 'MEDIUM',
   status: 'TODO',
 };
 
 function TasksPage() {
   const [tasks, setTasks] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [error, setError] = useState('');
   const [form, setForm] = useState(defaultTaskForm);
 
   const fetchTasks = async () => {
@@ -19,7 +22,7 @@ function TasksPage() {
   };
 
   useEffect(() => {
-    fetchTasks();
+    Promise.all([fetchTasks(), projectApi.getProjects()]).then(([, projectList]) => setProjects(projectList)).catch(() => setError('Tasks or projects could not be loaded.'));
   }, []);
 
   const handleChange = (event) => {
@@ -29,9 +32,14 @@ function TasksPage() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const created = await taskApi.createTask(form);
-    setTasks((current) => [created, ...current]);
-    setForm(defaultTaskForm);
+    setError('');
+    try {
+      const created = await taskApi.createTask({ ...form, projectId: Number(form.projectId) });
+      setTasks((current) => [created, ...current]);
+      setForm({ ...defaultTaskForm, projectId: projects[0]?.id || '' });
+    } catch {
+      setError('Task could not be created. Check the project and your permissions.');
+    }
   };
 
   return (
@@ -54,9 +62,13 @@ function TasksPage() {
             Description
             <textarea name="description" value={form.description} onChange={handleChange} rows="4" />
           </label>
+          {error && <p role="alert" className="error-box">{error}</p>}
           <label>
-            Project ID
-            <input name="projectId" type="number" value={form.projectId} onChange={handleChange} />
+            Project
+            <select name="projectId" value={form.projectId} onChange={handleChange} required>
+              <option value="">Choose a project</option>
+              {projects.map((project) => <option key={project.id} value={project.id}>{project.name}</option>)}
+            </select>
           </label>
           <label>
             Priority
@@ -71,10 +83,12 @@ function TasksPage() {
             <select name="status" value={form.status} onChange={handleChange}>
               <option value="TODO">To do</option>
               <option value="IN_PROGRESS">In progress</option>
-              <option value="DONE">Done</option>
+              <option value="COMPLETED">Completed</option>
+              <option value="IN_REVIEW">In review</option>
+              <option value="CANCELLED">Cancelled</option>
             </select>
           </label>
-          <button type="submit" className="primary-button">Create task</button>
+          <button type="submit" className="primary-button" disabled={!projects.length}>Create task</button>
         </form>
 
         <div className="panel project-list-panel">

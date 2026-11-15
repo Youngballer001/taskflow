@@ -1,1 +1,1 @@
-// ProjectMembers component will be implemented here
+export default function ProjectMembers({ members = [], onRemove, canManage = false }) { return <ul className="member-list">{members.map((member) => <li key={member.id}><span><strong>{member.fullName}</strong><small>{member.email}</small></span><span>{member.role}{canManage && member.role !== 'OWNER' && <button type="button" onClick={() => onRemove(member.userId)}>Remove</button>}</span></li>)}</ul>; }

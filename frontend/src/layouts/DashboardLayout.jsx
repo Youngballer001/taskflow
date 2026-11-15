@@ -1,16 +1,4 @@
-import Sidebar from '../components/layout/Sidebar';
-import Navbar from '../components/layout/Navbar';
-
-function DashboardLayout({ children }) {
-  return (
-    <div className="app-shell">
-      <Sidebar />
-      <div className="main-panel">
-        <Navbar />
-        <main className="page-container">{children}</main>
-      </div>
-    </div>
-  );
-}
+import AppLayout from '../components/layout/AppLayout';
+function DashboardLayout({ children }) { return <AppLayout>{children}</AppLayout>; }
 
 export default DashboardLayout;

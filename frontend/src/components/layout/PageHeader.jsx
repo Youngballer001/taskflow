@@ -1,1 +1,1 @@
-// PageHeader component will be implemented here
+export default function PageHeader({ title, description, actions }) { return <header className="page-header"><div><h2>{title}</h2>{description && <p>{description}</p>}</div>{actions && <div className="page-header-actions">{actions}</div>}</header>; }

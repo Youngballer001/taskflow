@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import com.taskflow.exception.UnauthorizedException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,5 +35,23 @@ public class RefreshTokenService {
         return refreshTokenRepository.findByToken(token)
                 .map(rt -> !rt.isExpired())
                 .orElse(false);
+    }
+
+    @Transactional
+    public User rotate(String token) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
+                .orElseThrow(() -> new UnauthorizedException("Refresh token is invalid or expired"));
+        if (refreshToken.isExpired()) {
+            refreshTokenRepository.delete(refreshToken);
+            throw new UnauthorizedException("Refresh token is invalid or expired");
+        }
+        User user = refreshToken.getUser();
+        refreshTokenRepository.delete(refreshToken);
+        return user;
+    }
+
+    @Transactional
+    public void revoke(String token) {
+        if (token != null && !token.isBlank()) refreshTokenRepository.deleteByToken(token);
     }
 }

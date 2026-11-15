@@ -28,6 +28,12 @@ public class TaskCommentController {
         return ResponseEntity.ok(taskCommentService.createComment(taskId, request));
     }
 
+    @PutMapping("/{taskId}/comments/{commentId}")
+    public ResponseEntity<CommentResponse> updateComment(@PathVariable Long taskId, @PathVariable Long commentId,
+                                                         @Valid @RequestBody CreateCommentRequest request) {
+        return ResponseEntity.ok(taskCommentService.updateComment(taskId, commentId, request));
+    }
+
     @DeleteMapping("/{taskId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long taskId, @PathVariable Long commentId) {
         taskCommentService.deleteComment(taskId, commentId);

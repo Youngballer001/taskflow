@@ -1,28 +1,12 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { createContext, useContext } from 'react';
+import useNotificationsData from '../hooks/useNotifications';
+import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext(null);
 
 export function NotificationProvider({ children }) {
-  const [notifications, setNotifications] = useState([
-    { id: 1, message: 'Your sprint review is tomorrow.', read: false },
-    { id: 2, message: 'Alex completed the onboarding checklist.', read: true },
-  ]);
-
-  const addNotification = (message) => {
-    setNotifications((current) => [
-      { id: Date.now(), message, read: false },
-      ...current,
-    ]);
-  };
-
-  const markAllAsRead = () => {
-    setNotifications((current) => current.map((item) => ({ ...item, read: true })));
-  };
-
-  const value = useMemo(
-    () => ({ notifications, addNotification, markAllAsRead }),
-    [notifications]
-  );
+  const { isAuthenticated } = useAuth();
+  const value = useNotificationsData({ enabled: isAuthenticated });
 
   return <NotificationContext.Provider value={value}>{children}</NotificationContext.Provider>;
 }

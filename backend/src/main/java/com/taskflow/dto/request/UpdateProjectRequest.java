@@ -2,6 +2,7 @@ package com.taskflow.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.taskflow.enums.ProjectStatus;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -18,4 +19,6 @@ public class UpdateProjectRequest {
     private LocalDate startDate;
 
     private LocalDate dueDate;
+
+    private ProjectStatus status;
 }

@@ -3,6 +3,7 @@ package com.taskflow.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import com.taskflow.validation.ValidPassword;
 import lombok.Data;
 
 @Data
@@ -17,7 +18,8 @@ public class RegisterRequest {
     private String email;
     
     @NotBlank(message = "Password is required")
-    @Size(min = 6, max = 100, message = "Password must be between 6 and 100 characters")
+    @ValidPassword
+    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
     private String password;
     
     @NotBlank(message = "Password confirmation is required")

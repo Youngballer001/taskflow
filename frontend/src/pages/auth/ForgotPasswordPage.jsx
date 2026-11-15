@@ -4,7 +4,7 @@ function ForgotPasswordPage() {
   return (
     <div className="auth-form-container">
       <h2>Reset password</h2>
-      <p>Password reset workflows can be connected to your auth provider here.</p>
+      <p>Password reset is not available because TaskFlow has no configured email delivery service. Contact your administrator to reset your account.</p>
       <Link to="/login">Back to login</Link>
     </div>
   );

@@ -3,6 +3,7 @@ package com.taskflow.service;
 import com.taskflow.dto.request.ChangePasswordRequest;
 import com.taskflow.dto.request.UpdateProfileRequest;
 import com.taskflow.dto.response.UserResponse;
+import com.taskflow.dto.request.UpdateUserRoleRequest;
 import com.taskflow.entity.User;
 import com.taskflow.exception.BadRequestException;
 import com.taskflow.exception.ForbiddenException;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import com.taskflow.enums.UserRole;
 
 @Service
 @RequiredArgsConstructor
@@ -45,6 +47,34 @@ public class UserService {
 
     public Page<UserResponse> getAllUsers(Pageable pageable) {
         return userRepository.findAll(pageable).map(UserMapper::toResponse);
+    }
+
+    public Page<UserResponse> searchUsers(String query, Pageable pageable) {
+        if (query == null || query.isBlank()) return getAllUsers(pageable);
+        String term = query.trim();
+        return userRepository.findByFullNameContainingIgnoreCaseOrEmailContainingIgnoreCase(term, term, pageable)
+                .map(UserMapper::toResponse);
+    }
+
+    @Transactional
+    public UserResponse updateRole(Long id, UpdateUserRoleRequest request) {
+        requireAdministrator();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        user.setRole(request.getRole());
+        return UserMapper.toResponse(userRepository.save(user));
+    }
+
+    @Transactional
+    public UserResponse setAccountActive(Long id, boolean active) {
+        requireAdministrator();
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        if (!active && user.getId().equals(securityUtil.getCurrentUser().getId())) {
+            throw new BadRequestException("You cannot deactivate your own administrator account");
+        }
+        user.setIsActive(active);
+        return UserMapper.toResponse(userRepository.save(user));
     }
 
     @Transactional
@@ -75,14 +105,12 @@ public class UserService {
 
     @Transactional
     public void deactivateUser(Long id) {
-        User currentUser = securityUtil.getCurrentUser();
-        if (!currentUser.getRole().name().equals("ADMIN") && !currentUser.getId().equals(id)) {
-            throw new ForbiddenException("You are not allowed to deactivate this user");
-        }
+        setAccountActive(id, false);
+    }
 
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
-        user.setIsActive(false);
-        userRepository.save(user);
+    private void requireAdministrator() {
+        if (securityUtil.getCurrentUser().getRole() != UserRole.ADMIN) {
+            throw new ForbiddenException("Administrator permission is required");
+        }
     }
 }

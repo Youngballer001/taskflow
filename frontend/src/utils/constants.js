@@ -1,1 +1,4 @@
-// Constants will be implemented here
+export const PROJECT_STATUSES = ['PLANNING', 'ACTIVE', 'ON_HOLD', 'COMPLETED', 'CANCELLED'];
+export const TASK_STATUSES = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'COMPLETED', 'CANCELLED'];
+export const TASK_PRIORITIES = ['LOW', 'MEDIUM', 'HIGH', 'URGENT'];
+export const USER_ROLES = ['ADMIN', 'PROJECT_MANAGER', 'TEAM_MEMBER'];

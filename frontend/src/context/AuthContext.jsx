@@ -36,7 +36,12 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      if (auth?.refreshToken) await authApi.logout(auth.refreshToken);
+    } catch {
+      // Clear the local session even if the server is unavailable.
+    }
     setAuth(null);
     clearStoredAuth();
   };
@@ -50,6 +55,7 @@ export function AuthProvider({ children }) {
       loading,
       login,
       register,
+      updateUser: (user) => { if (auth) saveAuth({ ...auth, user }); },
       logout,
     }),
     [auth, loading]

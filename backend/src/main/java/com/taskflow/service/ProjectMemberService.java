@@ -13,6 +13,7 @@ import com.taskflow.repository.ProjectMemberRepository;
 import com.taskflow.repository.ProjectRepository;
 import com.taskflow.repository.UserRepository;
 import com.taskflow.util.SecurityUtil;
+import com.taskflow.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class ProjectMemberService {
     private final ProjectMemberRepository projectMemberRepository;
     private final UserRepository userRepository;
     private final SecurityUtil securityUtil;
+    private final NotificationService notificationService;
 
     public List<ProjectMemberResponse> getProjectMembers(Long projectId) {
         Project project = projectRepository.findById(projectId)
@@ -44,9 +46,7 @@ public class ProjectMemberService {
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + projectId));
         User currentUser = securityUtil.getCurrentUser();
 
-        if (!project.getOwner().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("Only the project owner can add members");
-        }
+        requireProjectManager(project, currentUser);
 
         String email = request.getEmail().trim().toLowerCase();
         User memberUser = userRepository.findByEmail(email)
@@ -65,7 +65,10 @@ public class ProjectMemberService {
         member.setUser(memberUser);
         member.setRole("MEMBER");
 
-        return toResponse(projectMemberRepository.save(member));
+        ProjectMember saved = projectMemberRepository.save(member);
+        notificationService.createNotification(memberUser, com.taskflow.enums.NotificationType.PROJECT_MEMBER_ADDED,
+                "You were added to project " + project.getName(), project, null);
+        return toResponse(saved);
     }
 
     @Transactional
@@ -74,9 +77,7 @@ public class ProjectMemberService {
                 .orElseThrow(() -> new ResourceNotFoundException("Project not found with id: " + projectId));
         User currentUser = securityUtil.getCurrentUser();
 
-        if (!project.getOwner().getId().equals(currentUser.getId())) {
-            throw new ForbiddenException("Only the project owner can remove members");
-        }
+        requireProjectManager(project, currentUser);
 
         User memberUser = userRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + memberId));
@@ -96,6 +97,16 @@ public class ProjectMemberService {
         if (!project.getOwner().getId().equals(currentUser.getId())
                 && !projectMemberRepository.existsByProjectAndUser(project, currentUser)) {
             throw new ForbiddenException("You do not have access to this project");
+        }
+    }
+
+    private void requireProjectManager(Project project, User currentUser) {
+        boolean owner = project.getOwner().getId().equals(currentUser.getId());
+        boolean admin = currentUser.getRole() == UserRole.ADMIN;
+        boolean managerMember = currentUser.getRole() == UserRole.PROJECT_MANAGER
+                && projectMemberRepository.existsByProjectAndUser(project, currentUser);
+        if (!owner && !admin && !managerMember) {
+            throw new ForbiddenException("Project manager permission is required");
         }
     }
 

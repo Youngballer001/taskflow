@@ -8,7 +8,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "echo \"Tests will be configured later\" && exit 0"
+    "test": "node --test"
   },
   "dependencies": {
     "react": "^18.2.0",

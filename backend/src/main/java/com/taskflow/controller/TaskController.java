@@ -19,6 +19,11 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    @GetMapping
+    public ResponseEntity<List<TaskResponse>> getMyTasks() {
+        return ResponseEntity.ok(taskService.getUserTasks());
+    }
+
     @GetMapping("/project/{projectId}")
     public ResponseEntity<List<TaskResponse>> getTasksForProject(@PathVariable Long projectId) {
         return ResponseEntity.ok(taskService.getTasksForProject(projectId));

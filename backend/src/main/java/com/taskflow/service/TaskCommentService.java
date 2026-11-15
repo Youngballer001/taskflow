@@ -6,6 +6,7 @@ import com.taskflow.entity.Project;
 import com.taskflow.entity.Task;
 import com.taskflow.entity.TaskComment;
 import com.taskflow.entity.User;
+import com.taskflow.enums.ActivityType;
 import com.taskflow.exception.BadRequestException;
 import com.taskflow.exception.ForbiddenException;
 import com.taskflow.exception.ResourceNotFoundException;
@@ -30,6 +31,7 @@ public class TaskCommentService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final SecurityUtil securityUtil;
+    private final ActivityLogService activityLogService;
 
     public List<CommentResponse> getCommentsForTask(Long taskId) {
         Task task = taskRepository.findById(taskId)
@@ -56,7 +58,9 @@ public class TaskCommentService {
         comment.setUser(currentUser);
         comment.setContent(request.getContent().trim());
 
-        return CommentMapper.toResponse(taskCommentRepository.save(comment));
+        TaskComment saved = taskCommentRepository.save(comment);
+        activityLogService.record(currentUser, ActivityType.TASK_COMMENT_ADDED, "Commented on task " + task.getTitle(), task.getProject(), task);
+        return CommentMapper.toResponse(saved);
     }
 
     @Transactional
@@ -78,6 +82,20 @@ public class TaskCommentService {
         }
 
         taskCommentRepository.delete(comment);
+    }
+
+    @Transactional
+    public CommentResponse updateComment(Long taskId, Long commentId, CreateCommentRequest request) {
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
+        validateProjectAccess(task.getProject());
+        TaskComment comment = taskCommentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
+        if (!comment.getTask().getId().equals(taskId)) throw new BadRequestException("Comment does not belong to this task");
+        User currentUser = securityUtil.getCurrentUser();
+        if (!comment.getUser().getId().equals(currentUser.getId())) throw new ForbiddenException("Only the comment author can edit it");
+        comment.setContent(request.getContent().trim());
+        return CommentMapper.toResponse(taskCommentRepository.save(comment));
     }
 
     private void validateProjectAccess(Project project) {

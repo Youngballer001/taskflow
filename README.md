@@ -1,202 +1,82 @@
-# TaskFlow - Project Management Application
+# TaskFlow
 
-TaskFlow is a modern, full-stack project management application designed to help teams organize, track, and manage their projects and tasks efficiently.
+TaskFlow is a project and task management application built with React, Spring Boot, and MySQL. The repository contains a substantial working implementation, but some requested modules and test coverage remain incomplete; see [Known gaps](#known-gaps).
 
-## 🚀 Features
+## Implemented features
 
-The following features are planned for TaskFlow:
+- Registration and login with BCrypt password hashing and JWT access tokens.
+- Database-backed refresh token rotation and logout.
+- Project and task APIs with project membership checks and role-aware mutations.
+- Task comments, notifications, activity records, dashboard aggregates, and reports on the backend.
+- Responsive React pages for authentication, projects, tasks, dashboard, reports, notifications, and profile.
+- Kanban board with persisted task status changes and rollback on API errors.
+- Flyway migrations, Dockerfiles, Compose, Nginx API proxy, and OpenAPI UI.
 
-- **User Management**: User registration, authentication, and profile management
-- **Project Management**: Create, update, and manage projects
-- **Task Management**: Create, assign, and track tasks with priorities and statuses
-- **Team Collaboration**: Add team members to projects and assign tasks
-- **Kanban Board**: Visual task management with drag-and-drop functionality
-- **Comments & Activity**: Comment on tasks and track project activity
-- **Notifications**: Real-time notifications for task updates and assignments
-- **Dashboard**: Overview of projects, tasks, and team activity
-- **Reports**: Generate reports on project progress and team performance
+## Technology
 
-## 🛠️ Technology Stack
+- Java 21, Spring Boot 3.x, Spring Security, Spring Data JPA, Flyway, Maven
+- React 18, Vite, React Router, Axios, Recharts
+- MySQL 8
+- Docker Compose and Nginx
 
-### Backend
-- **Java 25 (LTS)**
-- **Spring Boot 3.x**
-- **Spring Security** (JWT Authentication)
-- **Spring Data JPA** with Hibernate
-- **MySQL 8**
-- **Flyway** (Database Migrations)
-- **Maven** (Build Tool)
-- **JUnit 5 & Mockito** (Testing)
+## Requirements
 
-### Frontend
-- **React 18**
-- **JavaScript**
-- **Vite** (Build Tool)
-- **React Router** (Routing)
-- **Axios** (HTTP Client)
-- **Context API** (State Management)
-- **Recharts** (Charts & Visualization)
-- **React Beautiful DnD** (Drag & Drop)
+- Java 21 and Maven 3.8+
+- Node.js 18+ and npm
+- MySQL 8, or Docker Desktop with Compose
 
-### Database
-- **MySQL 8**
+## Local setup (Windows 11)
 
-### DevOps & Tools
-- **Docker & Docker Compose**
-- **Git & GitHub**
-- **GitHub Actions** (CI/CD)
-- **Nginx** (Production Server)
+1. Copy `.env.example` to `.env` in the project root. Replace the example database passwords and `JWT_SECRET` with private values. Keep the JWT secret at least 32 bytes long.
+2. Create the database `taskflow_db` and a MySQL user matching `DB_USERNAME` and `DB_PASSWORD`. Flyway creates the tables on backend startup.
+3. In a PowerShell terminal, set the backend variables from `.env` or export them in your user environment. Start the backend:
 
-## 📁 Project Structure
-
-```
-taskflow/
-├── backend/              # Spring Boot backend application
-│   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   └── resources/
-│   │   └── test/
-│   └── pom.xml
-├── frontend/             # React frontend application
-│   ├── public/
-│   ├── src/
-│   │   ├── api/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── pages/
-│   │   └── utils/
-│   ├── package.json
-│   └── vite.config.js
-├── database/             # Database scripts
-├── docs/                 # Documentation
-├── docker/               # Docker configuration files
-├── .github/              # GitHub Actions workflows
-├── docker-compose.yml    # Docker Compose configuration
-└── README.md
-```
-
-## 🚦 Getting Started
-
-### Prerequisites
-
-- **Java 25** (LTS)
-- **Node.js 18** or higher
-- **MySQL 8** or higher
-- **Maven 3.8+**
-- **Git**
-
-### Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
+   ```powershell
    cd backend
-   ```
-
-2. Configure the database connection in `src/main/resources/application.properties` or use environment variables.
-
-3. Build the application:
-   ```bash
-   mvn clean install
-   ```
-
-4. Run the application:
-   ```bash
    mvn spring-boot:run
    ```
 
-The backend will be available at `http://localhost:8080`
+4. In another terminal, start the frontend. Vite proxies `/api` to `http://localhost:8080`:
 
-### Frontend Setup
-
-1. Navigate to the frontend directory:
-   ```bash
+   ```powershell
    cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
    npm install
-   ```
-
-3. Create a `.env` file based on `.env.example` and configure the API URL.
-
-4. Run the development server:
-   ```bash
    npm run dev
    ```
 
-The frontend will be available at `http://localhost:5173`
+5. Open `http://localhost:5173`. Swagger UI is at `http://localhost:8080/swagger-ui/index.html`.
 
-### Database Setup
+## Docker Compose
 
-1. Create a MySQL database:
-   ```sql
-   CREATE DATABASE taskflow_db;
-   ```
+From the repository root, configure `.env`, then run:
 
-2. Flyway migrations will run automatically when the backend starts.
-
-### Using Docker Compose
-
-1. Copy `.env.example` to `.env` and configure the environment variables.
-
-2. Run the application:
-   ```bash
-   docker-compose up -d
-   ```
-
-3. Access the application:
-   - Frontend: `http://localhost:5173`
-   - Backend: `http://localhost:8080`
-
-## 🧪 Testing
-
-### Backend Tests
-```bash
-cd backend
-mvn test
+```powershell
+docker compose up --build
 ```
 
-### Frontend Tests
-```bash
+Open `http://localhost:5173`. MySQL data is persisted in the `mysql-data` volume. Flyway owns schema creation; the standalone SQL files are reference/development scripts and are not mounted into the MySQL initialization directory.
+
+## Verification
+
+```powershell
 cd frontend
 npm test
+npm run build
 ```
 
-## 📚 Documentation
+Backend tests can be run with `cd backend; mvn test`. Docker configuration can be checked with `docker compose --env-file .env.example config`.
 
-- [Project Overview](docs/project-overview.md)
-- [System Architecture](docs/system-architecture.md)
-- [Database Design](docs/database-design.md)
-- [API Documentation](docs/api-documentation.md)
-- [Installation Guide](docs/installation-guide.md)
-- [User Guide](docs/user-guide.md)
-- [Testing Guide](docs/testing-guide.md)
-- [Deployment Guide](docs/deployment-guide.md)
+## Project layout
 
-## 🤝 Contributing
+- `backend/src/main/java`: Spring controllers, services, repositories, entities, DTOs, security, and validation
+- `backend/src/main/resources/db/migration`: Flyway migrations
+- `frontend/src`: React routes, pages, API clients, and styles
+- `database`: schema and sample SQL references
+- `docker`: backend/frontend images and Nginx configuration
+- `docs`: architecture, requirements, database, API, setup, user, security, testing, and deployment guides
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## Known gaps
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+The frontend build and shared-validation tests are verified. Backend code compiles and five focused JUnit tests pass. The Docker daemon is unavailable, so MySQL integration/migration execution and image builds remain unverified. Password reset email delivery and full browser-level frontend tests remain incomplete. New registrations receive the `TEAM_MEMBER` role. For local development only, `database/seed.sql` accepts an explicitly supplied email, full name, and BCrypt hash; no demo password is stored in the repository.
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## ⚠️ Development Status
-
-**Note**: This project structure has been created but features are not yet implemented. The structure is ready for development to begin.
-
-## 📧 Contact
-
-For questions or feedback, please open an issue on GitHub.
-
----
-
-**Built with ❤️ using Spring Boot and React**
+See the individual guides under `docs/` for more details. Do not use the example environment values in production. Configure HTTPS and production secrets before deployment.

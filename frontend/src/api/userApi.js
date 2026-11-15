@@ -1,31 +1,18 @@
 import api from './axiosInstance';
 
-const fallbackUsers = [
-  { id: 1, fullName: 'Demo User', email: 'demo@taskflow.app', role: 'ADMIN' },
-  { id: 2, fullName: 'Sarah Chen', email: 'sarah@taskflow.app', role: 'PROJECT_MANAGER' },
-  { id: 3, fullName: 'Alex Park', email: 'alex@taskflow.app', role: 'TEAM_MEMBER' },
-  { id: 4, fullName: 'Priya Singh', email: 'priya@taskflow.app', role: 'TEAM_MEMBER' },
-];
+export const getCurrentUser = async () => (await api.get('/users/me')).data;
 
-export const getCurrentUser = async () => {
-  try {
-    const response = await api.get('/users/me');
-    return response.data;
-  } catch (error) {
-    return fallbackUsers[0];
-  }
-};
-
-export const getUsers = async () => {
-  try {
-    const response = await api.get('/users');
-    return response.data;
-  } catch (error) {
-    return fallbackUsers;
-  }
-};
+export const getUsers = async (params = {}) => (await api.get('/admin/users', { params })).data;
+export const updateUserRole = async (id, role) => (await api.patch(`/admin/users/${id}/role`, { role })).data;
+export const setUserActive = async (id, value) => (await api.patch(`/admin/users/${id}/active`, null, { params: { value } })).data;
+export const updateProfile = async (payload) => (await api.put('/users/me', payload)).data;
+export const changePassword = async (payload) => (await api.put('/users/me/password', payload)).data;
 
 export default {
   getCurrentUser,
   getUsers,
+  updateUserRole,
+  setUserActive,
+  updateProfile,
+  changePassword,
 };

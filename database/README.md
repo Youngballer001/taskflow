@@ -1,17 +1,11 @@
-# TaskFlow Database
+# Database setup and references
 
-This directory contains database-related files for the TaskFlow application.
+Flyway migrations in `backend/src/main/resources/db/migration` are the application source of truth. Spring is configured with `ddl-auto=validate`. The SQL files here are standalone reference/development scripts; Compose does not mount them into MySQL's initialization folder.
 
 ## Files
 
-- **schema.sql**: Complete database schema definition
-- **seed.sql**: Initial seed data for the application
-- **sample_data.sql**: Sample data for testing and development
+- `schema.sql`: complete MySQL 8 reference schema. It drops and recreates tables, so use only against a disposable local database.
+- `seed.sql`: development-only optional administrator bootstrap. Supply an email, full name, and BCrypt hash as MySQL session variables; the script has no default credentials and does nothing when the variables are unset.
+- `sample_data.sql`: idempotent sample project/task rows tied to the seeded local administrator.
 
-## Usage
-
-Instructions for setting up the database will be provided during the implementation phase.
-
-## Notes
-
-The actual migrations are managed by Flyway and located in `backend/src/main/resources/db/migration/`.
+Flyway creates the schema automatically when the backend starts. To create an isolated local database manually, execute `schema.sql`, then set the seed variables and source the development data scripts in the same MySQL session.

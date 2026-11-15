@@ -1,1 +1,2 @@
-// TaskStatusBadge component will be implemented here
+import { formatStatus } from '../../utils/formatters';
+export default function TaskStatusBadge({ status }) { return <span className={`status-badge status-${String(status || '').toLowerCase()}`}>{formatStatus(status)}</span>; }

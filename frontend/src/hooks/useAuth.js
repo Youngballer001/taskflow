@@ -1,1 +1,1 @@
-// useAuth hook will be implemented here
+export { useAuth as default, useAuth } from '../context/AuthContext';

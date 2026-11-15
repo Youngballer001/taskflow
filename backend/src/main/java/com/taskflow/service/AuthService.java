@@ -2,6 +2,7 @@ package com.taskflow.service;
 
 import com.taskflow.dto.request.LoginRequest;
 import com.taskflow.dto.request.RegisterRequest;
+import com.taskflow.dto.request.RefreshTokenRequest;
 import com.taskflow.dto.response.AuthResponse;
 import com.taskflow.dto.response.UserResponse;
 import com.taskflow.entity.User;
@@ -31,7 +32,8 @@ public class AuthService {
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
+        String email = request.getEmail().trim().toLowerCase();
+        if (userRepository.existsByEmail(email)) {
             throw new DuplicateResourceException("User with this email already exists");
         }
         if (!request.getPassword().equals(request.getConfirmPassword())) {
@@ -39,7 +41,7 @@ public class AuthService {
         }
 
         User user = new User();
-        user.setEmail(request.getEmail().trim().toLowerCase());
+        user.setEmail(email);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setFullName(request.getFullName().trim());
         user.setRole(UserRole.TEAM_MEMBER);
@@ -54,20 +56,34 @@ public class AuthService {
 
     @Transactional
     public AuthResponse login(LoginRequest request) {
+        String email = request.getEmail().trim().toLowerCase();
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                new UsernamePasswordAuthenticationToken(email, request.getPassword())
         );
 
         if (!authentication.isAuthenticated()) {
             throw new BadRequestException("Invalid credentials");
         }
 
-        User user = userRepository.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadRequestException("User not found"));
 
         String accessToken = jwtService.generateToken(user.getEmail());
         String refreshToken = refreshTokenService.createRefreshToken(user);
 
         return new AuthResponse(accessToken, refreshToken, UserMapper.toResponse(user));
+    }
+
+    @Transactional
+    public AuthResponse refresh(RefreshTokenRequest request) {
+        User user = refreshTokenService.rotate(request.getRefreshToken());
+        if (!Boolean.TRUE.equals(user.getIsActive())) throw new BadRequestException("Account is inactive");
+        return new AuthResponse(jwtService.generateToken(user.getEmail()),
+                refreshTokenService.createRefreshToken(user), UserMapper.toResponse(user));
+    }
+
+    @Transactional
+    public void logout(RefreshTokenRequest request) {
+        refreshTokenService.revoke(request.getRefreshToken());
     }
 }
