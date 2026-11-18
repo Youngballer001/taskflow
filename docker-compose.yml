@@ -29,12 +29,13 @@ services:
     container_name: taskflow-backend
     restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME}
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION: ${JWT_EXPIRATION}
-      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:5173}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN:-http://localhost:5174}
     ports:
       - "${BACKEND_PORT}:8080"
     depends_on:
@@ -42,9 +43,6 @@ services:
         condition: service_healthy
     networks:
       - taskflow-network
-    # Uncomment for development with hot reload
-    # volumes:
-    #   - ./backend/src:/app/src
 
   # Frontend Service
   frontend:
